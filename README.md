@@ -2,6 +2,8 @@
 
 nbviewer-neuromine is a fork of the [The Jupyter Notebook Viewer](http://nbviewer.ipython.org) and is tailored around navigating local notebook projects.
 
+![ScreenShot](nbviewer/static/img/neuromine_screenshot.png?raw=true "Frontpage screenshot")
+
 ## Motivation
 
 I am a data scientist working in collaboration with several experiment-focused, biology labs.
@@ -28,6 +30,20 @@ The original idea for this project was mine.
 - Importantly, I removed the input cells and the input and output prompts of the notebook rendering. (Another possibility was to use cell toggles or a global toggle, but aesthetically both these solutions suck so whatever.)
 - I added a simple but effective password protection (default is 'guest', but see below).
 - I edited the rendered HTMLs to reflect my own style and needs, removing a whole lot of clumsy information. See below on how to edit the frontpage.
+
+### Some todos and desiderata
+
+- [ ] use the config file for storing password
+- [ ] improve security and auth overall
+- [ ] notebook description in the tree view
+- [ ] interactive plots using widgets (it should already work but haven't tested)
+- [ ] button to enter edit mode
+- [ ] better/customizable folders filtering
+- [ ] fancy folder navigation
+- [ ] a way to quickly navigate from one subject to another (e.g., navbar?)
+- [ ] remove all the unnecessary nbviewer features
+- [ ] dataset upload
+- [ ] dataset run (e.g., trigger computation on separate server)
 
 ## A typical structure of my datasets
 
@@ -117,18 +133,6 @@ I took some code from the Jupyter Notebook security module.
 Being close to a newbie in the web apps world, the features I added on top of the nbviewer may be considered quite poorly implemented.
 For instance, I couldn't really follow the indications for customization in the Jupyter Notebook Viewer page, so I decided to go my own, more straight-forward and perhaps sacrilegious path.
 Any feedback or pull requests are more than welcome!
-
-### Some todos
-
-- [ ] use the config file for storing password
-- [ ] improve security and auth overall
-- [ ] notebook description in the tree view
-- [ ] interactive plots using widgets (it should already work but haven't tested)
-- [ ] button to enter edit mode
-- [ ] better/customizable folders filtering
-- [ ] fancy folder navigation
-- [ ] a way to quickly navigate from one subject to another (e.g., navbar?)
-- [ ] remove all the unnecessary nbviewer features
 
 ## Installation
 

@@ -120,15 +120,15 @@ Any feedback or pull requests are more than welcome!
 
 ### Some todos
 
-[ ] use the config file for storing password
-[ ] improve security and auth overall
-[ ] notebook description in the tree view
-[ ] interactive plots using widgets (it should already work but haven't tested)
-[ ] button to enter edit mode
-[ ] better/customizable folders filtering
-[ ] fancy folder navigation
-[ ] a way to quickly navigate from one subject to another (e.g., navbar?)
-[ ] remove all the unnecessary nbviewer features
+- [ ] use the config file for storing password
+- [ ] improve security and auth overall
+- [ ] notebook description in the tree view
+- [ ] interactive plots using widgets (it should already work but haven't tested)
+- [ ] button to enter edit mode
+- [ ] better/customizable folders filtering
+- [ ] fancy folder navigation
+- [ ] a way to quickly navigate from one subject to another (e.g., navbar?)
+- [ ] remove all the unnecessary nbviewer features
 
 ## Installation
 

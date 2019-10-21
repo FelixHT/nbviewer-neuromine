@@ -51,7 +51,6 @@ def walk_subpkg(name):
 pkg_data = {
     "nbviewer": (
         ['frontpage.json'] +
-        ['experimentpage.json'] +
         ['password.txt'] +
         walk_subpkg('static') +
         walk_subpkg('templates') +

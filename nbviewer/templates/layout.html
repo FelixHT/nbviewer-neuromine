@@ -91,23 +91,6 @@
         </a>
       </div>
 
-      <div class="collapse navbar-collapse">
-        <ul class="nav navbar-nav navbar-right">
-          <li>
-            <a class="active" href="http://jupyter.org">JUPYTER</a>
-          </li>
-          {{ head_text(from_base('/faq'), "FAQ") }}
-
-          {% block otherlinks %}
-            {% if provider_url %}
-              {{ head_icon(provider_url, "View on " + provider_label, provider_icon) }}
-            {% endif %}
-            {% if executor_url %}
-              {{ head_icon(executor_url, "Execute on " + executor_label, executor_icon) }}
-            {% endif %}
-          {% endblock %}
-        </ul>
-      </div><!-- /.navbar-collapse -->
       {% block menu_extra %}
       {% endblock %}
     </div>
@@ -130,8 +113,10 @@
 
         <div class="col-md-4">
           <p>
-            Delivered by <a href="http://www.fastly.com/">Fastly</a>,
-            Rendered by <a href="https://developer.rackspace.com/?nbviewer=awesome">Rackspace</a>
+	  Delivered by Fabio Stefanini
+          </p>
+          <p>
+	  fabioedoardoluigialberto AT gmail.com
           </p>
           <p>
             nbviewer GitHub <a href="https://github.com/jupyter/nbviewer">repository</a>.
@@ -160,7 +145,7 @@
   <script src="{{ static_url("components/headroom.js/dist/jQuery.headroom.min.js") }}"></script>
 
   {% block extra_script %}{% endblock %}
-
+<!--
   {% if google_analytics_id %}
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -172,7 +157,7 @@
     ga('set', 'anonymizeIp', true);
     ga('send', 'pageview');
   </script>
-  {% endif %}
+  {% endif %}-->
   <script>
     require({
         paths: {

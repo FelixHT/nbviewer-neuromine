@@ -53,6 +53,11 @@ def render_notebook(format, nb, url=None, forced_theme=None, config=None):
     if not name.endswith(".ipynb"):
         name = name + ".ipynb"
 
+    # remove input
+    exporter.exclude_input_prompt = True
+    exporter.exclude_output_prompt = True
+    exporter.exclude_input = True
+    
     html, resources = exporter.from_notebook_node(nb)
 
     if 'postprocess' in format:

@@ -32,6 +32,7 @@ class URLHandler(RenderingHandler):
     """Renderer for /url or /urls"""
     @cached
     @gen.coroutine
+    @web.authenticated
     def get(self, secure, netloc, url):
         proto = 'http' + secure
         netloc = url_unescape(netloc)

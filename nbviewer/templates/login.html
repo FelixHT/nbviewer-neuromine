@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<div id="ipython-main-app" class="container">
+    {# login_available means password-login is allowed. Show the form. #}
+          <div class="center-nav">
+            <form action="{{base_url}}login?next={{next}}" method="post" class="navbar-form">
+              <label for="password_input"><strong>Password:</strong></label>
+              <input type="password" name="password" id="password_input" class="form-control">
+              <button type="submit" class="btn btn-default" id="login_submit">Log in</button>
+            </form>
+          </div>
+    {% if message %}
+      <div class="row">
+      {% for key in message %}
+        <div class="message {{key}}">
+           {{message[key]}}
+        </div>
+      {% endfor %}
+      </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+

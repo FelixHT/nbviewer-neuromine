@@ -136,10 +136,15 @@ class LocalFileHandler(RenderingHandler):
                 app_log.warn("path: '%s' does not have execute permissions", fullpath)
                 return False
 
+        if fullpath.split(os.sep)[-1] in ['img', 'data', 'autorestore', 'code', 'scripts',
+                                          'preprocessing.ipynb', 'misc']:
+            return False
+
         return True
 
     @cached
     @gen.coroutine
+    @web.authenticated
     def get(self, path):
         """Get a directory listing, rendered notebook, or raw file
         at the given path based on the type and URL query parameters.

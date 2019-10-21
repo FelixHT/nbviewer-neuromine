@@ -76,6 +76,7 @@ def nrfoot():
 
 this_dir, this_filename = os.path.split(__file__)
 FRONTPAGE_JSON = os.path.join(this_dir, "frontpage.json")
+PASSWORD = os.path.join(this_dir, "password.txt")
 
 class NBViewer(Application):
 
@@ -86,6 +87,7 @@ class NBViewer(Application):
     # Use this to insert custom configuration of handlers for NBViewer extensions
     handler_settings = Dict().tag(config=True)
 
+    #login_handler  = Unicode(default_value="nbviewer.providers.handlers.LoginHandler",    help="The Tornado handler to manage login").tag(config=True)
     url_handler         = Unicode(default_value="nbviewer.providers.url.handlers.URLHandler",           help="The Tornado handler to use for viewing notebooks accessed via URL").tag(config=True)
     local_handler       = Unicode(default_value="nbviewer.providers.local.handlers.LocalFileHandler",   help="The Tornado handler to use for viewing notebooks found on a local filesystem").tag(config=True)
     github_blob_handler = Unicode(default_value="nbviewer.providers.github.handlers.GitHubBlobHandler", help="The Tornado handler to use for viewing notebooks stored as blobs on GitHub").tag(config=True)
@@ -216,10 +218,16 @@ class NBViewer(Application):
         # and provide the defaults of the other fields
         if 'sections' not in frontpage_setup:
             frontpage_setup = {
-                              'title':'nbviewer', 'subtitle':'A simple way to share Jupyter notebooks',
+                              'title':'neuromine', 'subtitle':'A simple way to explore data analysis results',
                               'show_input':True, 'sections':frontpage_setup
                               }
         return frontpage_setup
+
+    @cached_property
+    def password_setup(self):
+        with io.open(options.passwordfile, 'r+') as f:
+            password_setup = f.readlines()[0][2:-2]
+        return password_setup
 
     @cached_property
     def pool(self):
@@ -247,6 +255,7 @@ class NBViewer(Application):
     def init_tornado_application(self):
         # handle handlers
         handler_names = dict(
+                  #login_handler=self.login_handler,
                   url_handler=self.url_handler,
                   github_blob_handler=self.github_blob_handler,
                   github_tree_handler=self.github_tree_handler,
@@ -282,6 +291,7 @@ class NBViewer(Application):
                   fetch_kwargs=self.fetch_kwargs,
                   formats=self.formats,
                   frontpage_setup=self.frontpage_setup,
+                  password_setup=self.password_setup,
                   jinja2_env=self.env,
                   pool=self.pool,
                   rate_limiter=self.rate_limiter,
@@ -315,6 +325,11 @@ class NBViewer(Application):
                   hub_api_url=os.getenv('JUPYTERHUB_API_URL'),
                   hub_base_url=os.getenv('JUPYTERHUB_BASE_URL'),
                   log_function=log_request,
+        )
+        # other settings
+        settings.update(
+                login_url='/login',
+                cookie_secret = 'ciao'
         )
 
         if options.localfiles:
@@ -357,6 +372,7 @@ def init_options():
     define("threads", default=1, help="number of threads to use for rendering", type=int)
     define("processes", default=0, help="use processes instead of threads for rendering", type=int)
     define("frontpage", default=FRONTPAGE_JSON, help="path to json file containing frontpage content", type=str)
+    define("passwordfile", default=PASSWORD, help="path to text file containing the hashed password", type=str)
     define("sslcert", help="path to ssl .crt file", type=str)
     define("sslkey", help="path to ssl .key file", type=str)
     define("no_check_certificate", default=False, help="Do not validate SSL certificates", type=bool)
@@ -376,6 +392,7 @@ def init_options():
     define("jupyter_widgets_html_manager_version", default="*", help="Version specifier for @jupyter-widgets/html-manager JS package", type=str)
     define("content_security_policy", default="connect-src 'none';", help="Content-Security-Policy header setting", type=str)
     define("binder_base_url", default="https://mybinder.org/v2", help="URL base for binder notebook execution service", type=str)
+    define("password", default=False, help="Whether to ask for a password to access the viewer", type=str)
 
 
 def main(argv=None):

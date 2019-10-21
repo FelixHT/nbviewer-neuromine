@@ -1,215 +1,158 @@
-# Jupyter Notebook Viewer
+# nbviewer-neuromine
 
-Jupyter nbviewer is the web application behind [The Jupyter Notebook Viewer](http://nbviewer.ipython.org), which is graciously hosted by [Rackspace](https://developer.rackspace.com/?nbviewer=awesome).
+nbviewer-neuromine is a fork of the [The Jupyter Notebook Viewer](http://nbviewer.ipython.org) and is tailored around navigating local notebook projects.
 
-Run this locally to get most of the features of nbviewer on your own network.
+## Motivation
 
-If you need help using or installing Jupyter Notebook Viewer, please use the [jupyter/help](https://github.com/jupyter/help) issue tracker. If you would like to propose an enhancement to nbviewer or file a bug report, please [open an issue here, in the jupyter/nbviewer project](https://github.com/jupyter/nbviewer).
+I am a data scientist working in collaboration with several experiment-focused, biology labs.
+A big part of my research is to develop new techniques and ultimately model data to undertsand the underlying processes.
+The Jupyter notebooks allow for obvious flexibility but also transparency because every figure and every analysis comes with its own code.
+This turns out to be very useful not only for dissemination and collaboration but also for educating people on coding and data analysis.
+Hence, I have been working with Jupyter notebooks running on local servers for a while and that served the above purposes very well.
+However, I also needed to scale the approach to a larger pool of users who are not always consumers.
+Also, some of the analysis techniques are well established now and a polished viewer provides a bigger picture view on the datasets, which is ultimately useful to answer the scientific questions at hand.
+For this purpose I decided to run Jupyter notebook viewer locally.
+This allows me to share notebooks to multiple users in read-only mode.
+I then explored nbviewer's functionalities and learned a lot about its engines, so I started playing with them to meet some specific needs.
+I figured I had to modify some code so although I'm not sure a fork was strictly necessary, well here I am.
+I hope you enjoy the results of this experiment.
 
-## Quick Run
+### Why 'neuromine'??
 
-If you have `docker` installed, you can pull and run the currently built version of the Docker container by
+I work in neuroscience.
+I search brain mines for golden data.
+The original idea for this project was mine.
 
-```shell
-$ docker pull jupyter/nbviewer
-$ docker run -p 8080:8080 jupyter/nbviewer
+## Features
+
+- Importantly, I removed the input cells and the input and output prompts of the notebook rendering. (Another possibility was to use cell toggles or a global toggle, but aesthetically both these solutions suck so whatever.)
+- I added a simple but effective password protection (default is 'guest', but see below).
+- I edited the rendered HTMLs to reflect my own style and needs, removing a whole lot of clumsy information. See below on how to edit the frontpage.
+
+## A typical structure of my datasets
+
+Although in principle the viewer can be used in many different situations, I modified it with a specific model in mind.
+This model is reflected by the folder structure of my datasets.
+At the moment there is not much in the rendered HTMLs that reflects this structure and this allows for greater flexibility on a dataaset-by-dataset basis.
+However, I may change my mind in the future so let's just put it here:
+
+```
+/dataset
+|-- subj1
+|   |-- session1
+|   |   `-- nbs
+|   |       (analysis of single session data)
+|   |-- ...
+|   |-- sessionM
+|   `-- nbs
+|       (analysis comparing sessions, within subject)
+|-- ...
+|-- subjN
+|   |-- session1
+|   |-- ...
+|   `-- sessionO
+`-- nbs
+    (analysis comparing subjects)
 ```
 
-It automatically gets built with each push to `master`, so you'll always be able to get the freshest copy.
+## Frontpage example
 
-For speed and friendliness to GitHub, be sure to set `GITHUB_OAUTH_KEY` and `GITHUB_OAUTH_SECRET`:
+I use a frontpage that looks like this:
 
-```shell
-$ docker run -p 8080:8080 -e 'GITHUB_OAUTH_KEY=YOURKEY' \
-                          -e 'GITHUB_OAUTH_SECRET=YOURSECRET' \
-                          jupyter/nbviewer
+```
+{"title": "neuromine",
+ "subtitle": "<some subtitle>",
+ "text": "<my email>",
+ "show_input": false,
+ "sections":[
+   {   
+     "header":"<name of first group of datasets>",
+     "links":[
+       {
+         "text": "<name of first dataset>",
+         "target": "localfile/<folder name where notebooks are stored>",
+         "img": "/static/img/logo.png"
+       },
+       {
+         "text": "<name of second dataset>",
+         "target": "localfile/<folder name where notebooks are stored>",
+         "img": "/static/img/logo.png"
+       },
+     ]   
+   },  
+   {   
+     "header":"<name of second group of datasets>",
+     "links":[
+       {
+         "text": "<name of first dataset>",
+         "target": "localfile/<folder name where notebooks are stored>",
+         "img": "/static/img/logo.png"
+       },
+       {
+         "text": "<name of second dataset>",
+         "target": "localfile/<folder name where notebooks are stored>",
+         "img": "/static/img/logo.png"
+       },
+     ]   
+   },
+ ]
+}
+
 ```
 
-Or to use your GitHub personal access token, you can set just `GITHUB_API_TOKEN`.
+## Security
+**Warning: running the server on a public network is unsafe.**
 
+Please refer to [Jupyter Notebook](https://jupyter-notebook.readthedocs.io/en/stable/public_server.html) doc on how to generate a password.
+Copy the password into a file then pass the file via the `--passwordfile` inline option.
+Example:
+`u'sha1:18f0d2b1de95:90653605332a1b3c7d680010e509d2e15d7cd3c5'`
+(yes, the `u'` and `'` are important).
+You can also create your own certificates and pass them with the `--sslkey` and `--sslcert` inline options.
 
-## GitHub Enterprise
+I took some code from the Jupyter Notebook security module.
 
-To use nbviewer on your own GitHub Enterprise instance you need to set `GITHUB_API_URL`.
-The relevant [API endpoints for GitHub Enterprise](https://developer.github.com/v3/enterprise/) are prefixed with `http://hostname/api/v3`.
-You must also specify your `OAUTH` or `API_TOKEN` as explained above.  For example:
+## Disclaimer
 
-```shell
-$ docker run -p 8080:8080 -e 'GITHUB_OAUTH_KEY=YOURKEY' \
-                          -e 'GITHUB_OAUTH_SECRET=YOURSECRET' \
-                          -e 'GITHUB_API_URL=https://ghe.example.com/api/v3/' \
-                          jupyter/nbviewer
-```
+Being close to a newbie in the web apps world, the features I added on top of the nbviewer may be considered quite poorly implemented.
+For instance, I couldn't really follow the indications for customization in the Jupyter Notebook Viewer page, so I decided to go my own, more straight-forward and perhaps sacrilegious path.
+Any feedback or pull requests are more than welcome!
 
-With this configured all GitHub API requests will go to your Enterprise instance so you can view all of your internal notebooks.
+### Some todos
 
-## Local Development
+[ ] use the config file for storing password
+[ ] improve security and auth overall
+[ ] notebook description in the tree view
+[ ] interactive plots using widgets (it should already work but haven't tested)
+[ ] button to enter edit mode
+[ ] better/customizable folders filtering
+[ ] fancy folder navigation
+[ ] a way to quickly navigate from one subject to another (e.g., navbar?)
+[ ] remove all the unnecessary nbviewer features
 
-### With Docker
+## Installation
 
-You can build a docker image that uses your local branch.
+Tested on python 3.6.8.
+See the Local Installation in [The Jupyter Notebook Viewer](http://nbviewer.ipython.org) page.
+I generated a json file that I pass as `--frontpage`.
 
-
-#### Build
+## Run
 
 ```shell
 $ cd <path to repo>
-$ docker build -t nbviewer .
+$ python -m nbviewer --debug --no-cache --locafiles=<myfolder>
 ```
+where `<myfolder>` points to a folder with your datasets full of notebooks.
 
-
-#### Run
-
-```shell
-$ cd <path to repo>
-$ docker run -p 8080:8080 nbviewer
-```
-
-### With Docker Compose
-
-The Notebook Viewer uses `memcached` in production. To locally try out this
-setup, a [docker-compose](https://docs.docker.com/compose/) configuration is
-provided to easily start/stop the `nbviewer` and `memcached` containers
-together from a your current branch. You will need to install `docker` prior
-to this.
-
-#### Run
-
-```shell
-$ cd <path to repo>
-$ pip install docker-compose
-$ docker-compose up
-```
-
-
-### Local Installation
-
-The Notebook Viewer requires several binary packages to be installed on your system. The primary ones are `libmemcached-dev libcurl4-openssl-dev pandoc libevent-dev libgnutls28-dev`. Package names may differ on your system, see [salt-states](https://github.com/rgbkrk/salt-states-nbviewer/blob/master/nbviewer/init.sls) for more details.
-
-If they are installed, you can install the required Python packages via pip.
-
-```shell
-$ cd <path to repo>
-$ pip install -r requirements.txt
-```
-
-#### Static Assets
-
-Static assets are maintained with `bower` and `less` (which require having
-`npm` installed), and the `invoke` python module.
-
-```shell
-$ cd <path to repo>
-$ pip install -r requirements-dev.txt
-$ npm install
-$ invoke bower
-$ invoke less [-d]
-```
-
-This will download the relevant assets into `nbviewer/static/components` and create the built assets in `nbviewer/static/build`.
-
-Pass `-d` or `--debug` to `invoke less` to create a CSS sourcemap, useful for debugging.
-
-
-#### Running Locally
-
-```shell
-$ cd <path to repo>
-$ python -m nbviewer --debug --no-cache
-```
+Now navigate to `http://127.0.0.1:5000`.
+Type password `guest` and enjoy.
+**Warning: running the server on a public network is unsafe.**
 
 This will automatically relaunch the server if a change is detected on a python file, and not cache any results. You can then just do the modifications you like to the source code and/or the templates then refresh the pages.
 
+## What I ended up learning
 
-#### Running the Tests
-
-`nose` is used to run the test suite. The tests currently make calls to
-external APIs such as GitHub, so it is best to use your Github API Token when
-running:
-
-```shell
-$ cd <path to repo>
-$ pip install -r requirements-dev.txt
-$ GITHUB_API_TOKEN=<your token> python setup.py test
-```
-
-
-## Extending the Notebook Viewer
-### Providers
-Providers are sources of notebooks and directories of notebooks and directories.
-
-`nbviewer` ships with several providers
-- `url`
-- `gist`
-- `github`
-- `local`
-
-#### Writing a new Provider
-There are several already additional providers
-[proposed/requested](https://github.com/jupyter/nbviewer/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3Atag%3AProvider). Some providers are more involved than others, and some,
-such as those which would require user authentication, will take some work to
-support properly.
-
-A provider is implemented as a python module, which can expose a few functions:
-
-##### `uri_rewrites`
-If you just need to rewrite URLs (or URIs) of another site/namespace, implement
-`uri_rewrites`, which will allow the front page to transform an arbitrary string
-(usually an URI fragment), escape it correctly, and turn it into a "canonical"
-nbviewer URL. See the [dropbox provider](./nbviewer/providers/dropbox/handlers.py)
-for a simple example of rewriting URLs without using a custom API client.
-
-##### `default_handlers`
-If you need custom logic, such as connecting to an API, implement
-`default_handlers`. See the [github provider](./nbviewer/providers/github/handlers.py)
-for a complex example of providing multiple handlers.
-
-##### Error Handling
-While you _could_ re-implement upstream HTTP error handling, a small
-convenience method is provided for intercepting HTTP errors.
-On a given URL handler that inherits from `BaseHandler`, overload the
-`client_error_message` and re-call it with your message (or `None`). See the
-[gist provider](./nbviewer/providers/gist/handlers.py) for an example of customizing the
-error message.
-
-### Formats
-Formats are ways to present notebooks to the user.
-
-`nbviewer` ships with three providers:
-- `html`
-- `slides`
-- `script`
-
-#### Writing a new Format
-If you'd like to write a new format, open a ticket, or speak up on [gitter][]!
-We have some work yet to do to support your next big thing in notebook
-publishing, and we'd love to here from you.
-
-#### Config file
-
-Newer versions of NBViewer will be configurable using a config file, `nbviewer_config.py`. In the directory where you run the command `python -m nbviewer` to start NBViewer, also add a file `nbviewer_config.py` which uses [the standard configuration syntax for Jupyter projects](https://traitlets.readthedocs.io/en/stable/config.html). 
-
-For example, to configure the value of a configurable `foo`, add the line `c.NBViewer.foo = 'bar'` to the `nbviewer_config.py` file located where you run `python -m nbviewer`. Again, currently very few features of NBViewer are configurable this way, but we hope to steadily increase the number of configurable characteristics of NBViewer in future releases.
-
-## Securing the Notebook Viewer
-
-You can run the viewer as a [JupyterHub 0.7+ service](https://jupyterhub.readthedocs.io/en/latest/reference/services.html). Running the viewer as a service prevents users who have not authenticated with the Hub from acccessing the nbviewer instance. This setup can be useful for protecting access to local notebooks rendered with the `--localfiles` option.
-
-Add an entry like the following to your `jupyterhub_config.py` to have it start nbviewer as a managed service:
-
-```python
-c.JupyterHub.services = [
-    {
-        # the /services/<name> path for accessing the notebook viewer
-        'name': 'nbviewer',
-        # the interface and port nbviewer will use
-        'url': 'http://127.0.0.1:9000',
-        # the path to nbviewer repo
-        'cwd': '<path to repo>',
-        # command to start the nbviewer
-        'command': ['python', '-m', 'nbviewer']
-    }
-]
-```
-
-The nbviewer instance will automatically read the [various `JUPYTERHUB_*` environment variables](http://jupyterhub.readthedocs.io/en/latest/reference/services.html#launching-a-hub-managed-service) and configure itself accordingly. You can also run the nbviewer instance as an [externally managed JupyterHub service](http://jupyterhub.readthedocs.io/en/latest/reference/services.html#externally-managed-services), but must set the requisite environment variables yourself.
+- [Jinja](https://jinja.palletsprojects.com/en/2.10.x/)
+- [Tornado](https://www.tornadoweb.org/en/stable/)
+- some common best practices, e.g., the use of [traitlets](https://pypi.org/project/traitlets/)
+- how to encode and decode hash passwords using [hashlib](https://docs.python.org/2/library/hashlib.html)

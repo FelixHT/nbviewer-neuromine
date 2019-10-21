@@ -6,6 +6,7 @@
 #-----------------------------------------------------------------------------
 from tornado import web
 from tornado.log import app_log
+from tornado.escape import url_escape
 
 from .utils import transform_ipynb_uri, url_path_join
 
@@ -18,6 +19,58 @@ from .providers.base import (
     format_prefix,
 )
 
+#from .security import passwd_check
+
+from urllib.parse import urlparse
+
+import hashlib
+from ipython_genutils.py3compat import cast_bytes, str_to_bytes, cast_unicode
+
+def passwd_check(hashed_passphrase, passphrase):
+    """Verify that a given passphrase matches its hashed version.
+
+    Parameters
+    ----------
+    hashed_passphrase : str
+        Hashed password, in the format returned by `passwd`.
+    passphrase : str
+        Passphrase to validate.
+
+    Returns
+    -------
+    valid : bool
+        True if the passphrase matches the hash.
+
+    Examples
+    --------
+    >>> passwd_check('sha1:0e112c3ddfce:a68df677475c2b47b6e86d0467eec97ac5f4b85a',
+    ...              'mypassword')
+    True
+
+    >>> passwd_check('sha1:0e112c3ddfce:a68df677475c2b47b6e86d0467eec97ac5f4b85a',
+    ...              'anotherpassword')
+    False
+    """
+    try:
+        algorithm, salt, pw_digest = hashed_passphrase.split(':', 2)
+    except (ValueError, TypeError):
+        return False
+
+    try:
+        h = hashlib.new(algorithm)
+    except ValueError:
+        return False
+
+    if len(pw_digest) == 0:
+        return False
+
+    h.update(cast_bytes(passphrase, 'utf-8') + cast_bytes(salt, 'ascii'))
+
+    #app_log.info(h.hexdigest())
+    #app_log.info(pw_digest)
+    #app_log.info("YES" if h.hexdigest() == pw_digest else "NO")
+
+    return h.hexdigest() == pw_digest
 #-----------------------------------------------------------------------------
 # Handler classes
 #-----------------------------------------------------------------------------
@@ -31,6 +84,7 @@ class Custom404(BaseHandler):
 
 class IndexHandler(BaseHandler):
     """Render the index"""
+    @web.authenticated
     def get(self):
         self.finish(self.render_template(
             'index.html',
@@ -43,6 +97,7 @@ class IndexHandler(BaseHandler):
 
 class FAQHandler(BaseHandler):
     """Render the markdown FAQ page"""
+    @web.authenticated
     def get(self):
         self.finish(self.render_template('faq.md'))
 
@@ -69,6 +124,74 @@ class CreateHandler(BaseHandler):
 
             type(self).uri_rewrite_list = provider_uri_rewrites(providers)
         return self.uri_rewrite_list
+
+class LoginHandler(BaseHandler):
+
+    def _redirect_safe(self, url, default=None):
+        """Redirect if url is on our PATH
+        Full-domain redirects are allowed if they pass our CORS origin checks.
+        Otherwise use default (self.base_url if unspecified).
+        """
+        if default is None:
+            default = self.base_url
+        # protect chrome users from mishandling unescaped backslashes.
+        # \ is not valid in urls, but some browsers treat it as /
+        # instead of %5C, causing `\\` to behave as `//`
+        url = url.replace("\\", "%5C")
+        parsed = urlparse(url)
+        if parsed.netloc or not (parsed.path + '/').startswith(self.base_url):
+            # require that next_url be absolute path within our path
+            allow = False
+            # OR pass our cross-origin check
+            if parsed.netloc:
+                # if full URL, run our cross-origin check:
+                origin = '%s://%s' % (parsed.scheme, parsed.netloc)
+                origin = origin.lower()
+                if self.allow_origin:
+                    allow = self.allow_origin == origin
+                elif self.allow_origin_pat:
+                    allow = bool(self.allow_origin_pat.match(origin))
+            if not allow:
+                # not allowed, use default
+                self.log.warning("Not allowing login redirect to %r" % url)
+                url = default
+        self.redirect(url)
+
+
+    def _render(self, message=None):
+        self.write(self.render_template(
+            'login.html',
+             next=url_escape(self.get_argument('next', default=self.base_url)),
+             message=message))
+
+    @property
+    def hashed_password(self):
+        return self.settings['password_setup']
+
+    def passwd_check(self, a, b):
+        return passwd_check(a, b)
+
+    def get(self):
+        self._render()
+
+    def post(self):
+        typed_password = self.get_argument('password', default=u'')
+ 
+        if not passwd_check(self.hashed_password, typed_password):
+            #app_log.info("NO")
+            self.set_status(401)
+            self._render('Invalid credentials')
+        else:
+            #app_log.info("YES")
+            self.set_secure_cookie("user", 'set')
+            next_url = self.get_argument('next', default=self.base_url)
+            self._redirect_safe(next_url)
+
+
+#class LogoutHandler(BaseHandler):
+#    def get(self):
+#        self.clear_cookie("user")
+#        self.redirect("/login")
 
 
 #-----------------------------------------------------------------------------
@@ -111,10 +234,12 @@ def init_handlers(formats, providers, base_url, localfiles, **handler_kwargs):
     handler_settings = handler_kwargs['handler_settings']
 
     pre_providers = [
-        ('/?', IndexHandler, {}),
+        ('/login', LoginHandler, {}),
+        (r'/?', IndexHandler, {}),
         ('/index.html', IndexHandler, {}),
         (r'/faq/?', FAQHandler, {}),
         (r'/create/?', CreateHandler, {}),
+        ('/localfile', IndexHandler, {}),
 
         # don't let super old browsers request data-uris
         (r'.*/data:.*;base64,.*', Custom404, {}),

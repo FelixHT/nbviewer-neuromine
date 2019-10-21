@@ -56,6 +56,9 @@ format_prefix = "/format/"
 class BaseHandler(web.RequestHandler):
     """Base Handler class with common utilities"""
 
+    def get_current_user(self):
+        return self.get_secure_cookie('user')
+
     def initialize(self, format=None, format_prefix="", **handler_settings):
         self.format = format or self.default_format
         self.format_prefix = format_prefix
@@ -184,6 +187,10 @@ class BaseHandler(web.RequestHandler):
     @property
     def frontpage_setup(self):
         return self.settings['frontpage_setup']
+
+    @property
+    def experimentpage_setup(self):
+        return self.settings['experimentpage_setup']
 
     @property
     def mathjax_url(self):
@@ -741,6 +748,9 @@ class FilesRedirectHandler(BaseHandler):
     matches behavior of old app, currently unused.
     """
     def get(self, before_files, after_files):
+        if not self.current_user:
+            self.redirect("/login")
+            return
         app_log.info("Redirecting %s to %s", before_files, after_files)
         self.redirect("%s/%s" % (before_files, after_files))
 
@@ -748,6 +758,9 @@ class FilesRedirectHandler(BaseHandler):
 class AddSlashHandler(BaseHandler):
     """redirector for URLs that should always have trailing slash"""
     def get(self, *args, **kwargs):
+        if not self.current_user:
+            self.redirect("/login")
+            return
         uri = self.request.path + '/'
         if self.request.query:
             uri = '%s?%s' % (uri, self.request.query)
@@ -757,6 +770,9 @@ class AddSlashHandler(BaseHandler):
 class RemoveSlashHandler(BaseHandler):
     """redirector for URLs that should never have trailing slash"""
     def get(self, *args, **kwargs):
+        if not self.current_user:
+            self.redirect("/login")
+            return
         uri = self.request.path.rstrip('/')
         if self.request.query:
             uri = '%s?%s' % (uri, self.request.query)

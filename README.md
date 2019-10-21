@@ -2,7 +2,7 @@
 
 nbviewer-neuromine is a fork of the [The Jupyter Notebook Viewer](http://nbviewer.ipython.org) and is tailored around navigating local notebook projects.
 
-![ScreenShot](https://raw.github.com/fabioedoardoluigialberto/nbviewer-neuromine/nbviewer/static/img/nbviewer_screenshot.png)
+![ScreenShot](/nbviewer/static/img/nbviewer_screenshot.png?raw=true "Frontpage screenshot")
 
 ## Motivation
 

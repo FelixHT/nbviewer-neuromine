@@ -35,6 +35,7 @@ The original idea for this project was mine.
 
 - [ ] use the config file for storing password
 - [ ] improve security and auth overall
+- [ ] logout
 - [ ] notebook description in the tree view
 - [ ] interactive plots using widgets (it should already work but haven't tested)
 - [ ] button to enter edit mode
@@ -44,6 +45,7 @@ The original idea for this project was mine.
 - [ ] remove all the unnecessary nbviewer features
 - [ ] dataset upload
 - [ ] dataset run (e.g., trigger computation on separate server)
+
 
 ## A typical structure of my datasets
 

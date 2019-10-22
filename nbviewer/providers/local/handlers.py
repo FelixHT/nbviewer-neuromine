@@ -66,6 +66,21 @@ class LocalFileHandler(RenderingHandler):
         return breadcrumbs
 
     @gen.coroutine
+    def launch(self, fullpath):
+        """Redirects to the notebook executor host
+
+        Parameters
+        ==========
+        fullpath: str
+            Absolute path to the file
+        """
+        host = self.settings.get('exec_host')
+        port = self.settings.get('exec_port')
+        url = url_path_join(str(host)+':'+str(port), fullpath)
+        app_log.info("Redirecting to: %s"%url)
+        return self.redirect(url)
+
+    @gen.coroutine
     def download(self, fullpath):
         """Download the file at the given absolute path.
 
@@ -172,6 +187,11 @@ class LocalFileHandler(RenderingHandler):
         is_download = self.get_query_arguments('download')
         if is_download:
             self.download(fullpath)
+            return
+
+        is_launch = self.get_query_arguments('launch')
+        if is_launch:
+            self.launch(fullpath.replace(self.localfile_path, '/notebooks'))
             return
 
         try:

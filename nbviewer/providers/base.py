@@ -234,6 +234,14 @@ class BaseHandler(web.RequestHandler):
             return self._statsd
 
     @property
+    def executor_host(self):
+        return self.settings['exec_host']
+
+    @property
+    def executor_port(self):
+        return self.settings['exec_port']
+
+    @property
     def base_url(self):
         return self.settings['base_url']
 
@@ -257,9 +265,11 @@ class BaseHandler(web.RequestHandler):
     # template rendering
     #---------------------------------------------------------------
 
-    def from_base(self, url, *args):
+    def from_base(self, url, exec_nb=False, *args):
+        #app_log.info(url)
         if not url.startswith('/') or url.startswith(self.base_url):
             return url_path_join(url, *args)
+        #base = self.base_url.replace('locafile', 'notebooks' if exec_nb else 'localfile')
         return url_path_join(self.base_url, url, *args)
 
     def get_template(self, name):
@@ -268,6 +278,7 @@ class BaseHandler(web.RequestHandler):
 
     def render_template(self, name, **namespace):
         namespace.update(self.template_namespace)
+        # app_log.info(namespace['executor_url'])
         template = self.get_template(name)
         return template.render(**namespace)
     
@@ -290,6 +301,7 @@ class BaseHandler(web.RequestHandler):
             "ipywidgets_base_url": self.ipywidgets_base_url,
             "jupyter_js_widgets_version": self.jupyter_js_widgets_version,
             "jupyter_widgets_html_manager_version": self.jupyter_widgets_html_manager_version,
+            "executor_url": "?launch",
         }
 
     def breadcrumbs(self, path, base_url):

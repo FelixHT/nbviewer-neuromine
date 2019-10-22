@@ -4,26 +4,8 @@
 
 
 {% block otherlinks %}
-  {% for fmt_name, fmt in formats.items() %}
-    {% if format != fmt_name %}
-      {% if fmt_name == default_format %}
-        {{ layout.head_icon(from_base(format_base), "View as " ~ fmt.label, fmt.icon) }}
-      {% else %}
-        {{ layout.head_icon(from_base(format_prefix, fmt_name, format_base), "View as " ~ fmt.label, fmt.icon) }}
-      {% endif %}
-    {% endif %}
-  {% endfor %}
-
-  {% if "kernelspec" in nb.metadata %}
-    {{ layout.head_icon("#", nb.metadata.kernelspec.display_name + " Kernel", "server") }}
-  {% endif %}
-
-  {% if provider_url %}
-    {{ layout.head_icon(provider_url, "View on " + provider_label, provider_icon) }}
-  {% endif %}
-
   {% if executor_url %}
-    {{ layout.head_icon(executor_url, "Execute on " + executor_label, executor_icon) }}
+    {{ layout.head_icon(executor_url, "Launch Notebook", "bolt", newtab=True) }}
   {% endif %}
 
   {{ layout.head_icon(download_url, "Download Notebook", "download", True) }}

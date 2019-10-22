@@ -314,6 +314,8 @@ class NBViewer(Application):
                   providers=options.providers,
                   render_timeout=options.render_timeout,
                   statsd_host=options.statsd_host,
+                  exec_port=options.exec_port,
+                  exec_host=options.exec_host,
                   statsd_port=options.statsd_port,
                   statsd_prefix=options.statsd_prefix,
         )
@@ -363,6 +365,8 @@ def init_options():
     define("localfile_any_user", default=False, help="Also serve files that are not readable by 'Other' on the local file system", type=bool)
     define("host", default=default_host, help="run on the given interface", type=str)
     define("port", default=default_port, help="run on the given port", type=int)
+    define("exec_host", default=None, help="executes notebooks on the given interface", type=str)
+    define("exec_port", default=None, help="executes notebooks on the given port", type=int)
     define("cache_expiry_min", default=10*60, help="minimum cache expiry (seconds)", type=int)
     define("cache_expiry_max", default=2*60*60, help="maximum cache expiry (seconds)", type=int)
     define("render_timeout", default=15, help="Time to wait for a render to complete before showing the 'Working...' page.", type=int)

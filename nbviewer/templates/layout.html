@@ -9,9 +9,9 @@
 {%- endmacro %}
 
 
-{% macro head_icon(url, name, icon, download=False) -%}
+{% macro head_icon(url, name, icon, download=False, newtab=False) -%}
   <li>
-    <a href="{{ from_base(url) }}" title="{{name}}" {%if download %}download{% endif %}>
+	  <a href="{{ from_base(url) }}" title="{{name}}" {%if newtab %}, target="_blank"{% endif %}  {%if download %}download{% endif %}>
       <span class="fa fa-{{icon}} fa-2x menu-icon"></span>
       <span class="menu-text">{{name}}</span>
     </a>
@@ -91,6 +91,23 @@
         </a>
       </div>
 
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a class="active" href="http://jupyter.org">JUPYTER</a>
+	  </li>
+	  <!--{{ head_text(from_base('/faq'), "FAQ") }}-->
+
+          {% block otherlinks %}
+            <!--{% if provider_url %}
+              {{ head_icon(provider_url, "View on " + provider_label, provider_icon) }}
+	      {% endif %}
+            {% if executor_url %}
+              {{ head_icon(executor_url, "Launch Notebook2", "bolt") }}
+	      {% endif %}-->
+          {% endblock %}
+        </ul>
+      </div><!-- /.navbar-collapse -->
       {% block menu_extra %}
       {% endblock %}
     </div>

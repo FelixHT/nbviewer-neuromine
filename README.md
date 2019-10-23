@@ -38,13 +38,12 @@ The original idea for this project was mine.
 - [ ] logout
 - [ ] notebook description in the tree view
 - [ ] interactive plots using widgets (it should already work but haven't tested)
-- [ ] button to enter edit mode
+- [x] button to enter edit mode on separate server
 - [ ] better/customizable folders filtering
 - [ ] fancy folder navigation
 - [ ] a way to quickly navigate from one subject to another (e.g., navbar?)
 - [ ] remove all the unnecessary nbviewer features
 - [ ] dataset upload
-- [ ] dataset run (e.g., trigger computation on separate server)
 
 
 ## A typical structure of my datasets
